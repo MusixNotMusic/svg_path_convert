@@ -117,6 +117,11 @@ function abasolute2relative(path) {
     return commands
 }
 
+function setStartMovePoint(commands, x, y) {
+    commands.coords[0] = x
+    commands.coords[1] = y
+}
+
 function toPathString(commands) {
     return commands.map((cmd) =>{
         return `${cmd.cmd} ${cmd.coords.join(' ')}`
