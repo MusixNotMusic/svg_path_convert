@@ -1,0 +1,44 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <canvas width="1800" height="900" id="canvas"></canvas>
+        <script>
+            var canvas = document.getElementById('canvas')
+            var ctx = canvas.getContext('2d')
+            ctx.beginPath();
+            ctx.strokeStyle = 'orange'
+            draw(ctx)
+            ctx.stroke()
+
+            function draw(ctx) {
+                ctx.translate(200, 200)
+                ctx.scale(10, 10)
+                ctx.moveTo(4, 8);
+                ctx.lineTo(10, 1);
+                ctx.lineTo(13, 0);
+                ctx.lineTo(12, 3);
+                ctx.lineTo(5, 9);
+                ctx.bezierCurveTo(6, 10, 6, 11, 7, 10);
+                ctx.bezierCurveTo(7, 11, 8, 12, 7, 12);
+                ctx.ellipse(1.42, 1.42, 0, 0, 1, 6, 13);
+                // ctx.ellipse(5, 5, 0, 0, 0, 4, 10);
+                // ctx.quadraticCurveTo(3.5, 9.9, 3.5, 10.5);
+                // ctx.quadraticCurveTo(3.5, 11.1, 2, 11.8);
+                // ctx.quadraticCurveTo(0.5, 12.500000000000002, 1.2, 11);
+                // ctx.quadraticCurveTo(1.9, 9.499999999999998, 2.5, 9.5);
+                // ctx.quadraticCurveTo(3.1, 9.500000000000002, 3, 9);
+                // ctx.ellipse(5, 5, 90, 0, 0, 0, 7);
+                // ctx.ellipse(1.42, 1.42, 0, 0, 1, 1, 6);
+                // ctx.bezierCurveTo(1, 5, 2, 6, 3, 6);
+                // ctx.bezierCurveTo(2, 7, 3, 7, 4, 8);
+                // ctx.moveTo(10, 1);
+                // ctx.lineTo(10, 3);
+                // ctx.lineTo(12, 3);
+                // ctx.lineTo(10.2, 2.8);
+                // ctx.lineTo(10, 1);
+            }
+
+        </script>
+    </body>
+</html>

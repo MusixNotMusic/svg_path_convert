@@ -8,7 +8,7 @@
  *         l dx dy
  * 3. horizontal
  *         H x (or h dx)
- * 4   vertical
+ * 4  vertical
  *         V y (or v dy)
  * 5. end
  *         Z z
@@ -37,6 +37,19 @@ let commandMapSize = {
     A: 7, // 曲线
     Z: -1
 }
+
+/**
+ *  svg command to canvas canvasRenderContext2D
+ *  svgCommand    canvasRenderContext2D
+ *  M             moveTo (x, y)
+ *  L             LineTo (x, y)
+ *  Q             quadraticCurveTo (dx1, dy1, x, y)
+ *  T             对称 (dx1, dy1)的控制点 在 (x, y) quadraticCurveTo  (2*x - dx1, 2*y - dy1, x, y)
+ *  C             bezierCurveTo (dx1, dy1, dx2, dy2, x, y)
+ *  S             对称 quadraticCurveTo (dx2, dy2)的控制点 在C (x, y) bezierCurveTo(2 * x - dx2, 2 * y - dy2, dx, dy, x, y)
+ *  A             ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
+ *  */ 
+
 
 // number regex
 const numnicReg = /[0-9.\-]{1,}/g
@@ -118,6 +131,87 @@ function abasolute2relative(path) {
     return commands
 }
 
+/**
+ *  svg command to canvas canvasRenderContext2D
+ *  svgCommand    canvasRenderContext2D
+ *  M             moveTo (x, y)
+ *  L             LineTo (x, y)
+ *  Q             quadraticCurveTo (dx1, dy1, x, y)
+ *  T             对称 (dx1, dy1)的控制点 在 (x, y) quadraticCurveTo  (2*x - dx1, 2*y - dy1, x, y)
+ *  C             bezierCurveTo (dx1, dy1, dx2, dy2, x, y)
+ *  S             对称 quadraticCurveTo (dx2, dy2)的控制点 在C (x, y) bezierCurveTo(2 * x - dx2, 2 * y - dy2, dx, dy, x, y)
+ *  A             ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
+ *  */ 
+
+function abasolute2CanvasRenderContextText(path) {
+    let commands = convertstandardCommand(path)
+    let len = commands.length
+    let i = 0
+    let prevCmd
+    let contextText = 'function draw(ctx) {\n'
+    while (i < len) {
+        let curCmd = commands[i]
+        switch(curCmd.cmd) {
+            case 'H': 
+                prevCmd = commands[i - 1]
+                let _y = prevCmd ? prevCmd.coords.slice(-2, -1) : 0
+                contextText += `  ctx.lineTo(${last.coords[0]}, ${_y});\n`
+                break;
+            case 'V': 
+                prevCmd = commands[i - 1]
+                let _x = prevCmd ? prevCmd.coords.slice(-1) : 0
+                contextText += `  ctx.lineTo(${_x}, ${last.coords[0]});\n`
+                break;
+            case 'M':
+                contextText += `  ctx.moveTo(${curCmd.coords.join(', ')});\n`
+                break;
+            case 'L':
+                contextText += `  ctx.lineTo(${curCmd.coords.join(', ')});\n`
+                break;
+            case 'Q':
+                contextText += `  ctx.quadraticCurveTo(${curCmd.coords.join(', ')});\n`
+                break;
+            case 'T':
+                prevCmd = commands[i - 1]
+                if (prevCmd && (prevCmd.cmd === 'T' || prevCmd.cmd === 'Q'))  {
+                   let xy = prevCmd.coords.slice(-2)
+                   let dxdy = prevCmd.coords.slice(-4,-2)
+                   let _dx1 = xy[0] * 2 - dxdy[0]
+                   let _dy1 = xy[1] * 2 - dxdy[1]
+                   curCmd.cmd = 'Q'
+                   curCmd.coords.unshift(_dx1, _dy1)
+                   contextText += `  ctx.quadraticCurveTo(${curCmd.coords.join(', ')});\n`
+                } else {
+                     throw new Error('ShortHead quadraticCurve is Error') 
+                }
+                break;
+            case 'C':
+                contextText += `  ctx.bezierCurveTo(${curCmd.coords.join(', ')});\n`
+                break;
+            case 'S':
+                prevCmd = commands[i - 1]
+                if (prevCmd && (prevCmd.cmd === 'S' || prevCmd.cmd === 'C'))  {
+                   let xy = prevCmd.coords.slice(-2)
+                   let dxdy = prevCmd.coords.slice(-4,-2)
+                   let _dx1 = xy[0] * 2 - dxdy[0]
+                   let _dy1 = xy[1] * 2 - dxdy[1]
+                   curCmd.cmd = 'C'
+                   curCmd.coords.unshift(_dx1, _dy1)
+                   contextText += `  ctx.bezierCurveTo(${curCmd.coords.join(', ')});\n`
+                } else {
+                     throw new Error('ShortHead bezierCurve is Error') 
+                }
+                break;
+            case 'A':
+                contextText += `  ctx.ellipse(${curCmd.coords.join(', ')});\n`
+                break;
+        }
+        i++;
+    }
+    contextText += '}\n'
+    return contextText
+}
+
 function setStartMovePoint(commands, x, y) {
     commands.coords[0] = x
     commands.coords[1] = y
@@ -130,5 +224,5 @@ function toPathString(commands) {
 }
 
 console.log(convertstandardCommand(sword))
-
-console.log(setStartMovePoint(abasolute2relative(sword), 100, 100))
+console.log(abasolute2CanvasRenderContextText(sword))
+// console.log(setStartMovePoint(abasolute2relative(sword), 100, 100))
