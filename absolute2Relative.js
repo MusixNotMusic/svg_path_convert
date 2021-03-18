@@ -41,9 +41,10 @@ let commandMapSize = {
 // number regex
 const numnicReg = /[0-9.\-]{1,}/g
 // command and number regex
-const commandNumnicReg =  /[MLQCHVZST]|[0-9.\s\,\-]*/g
+const commandNumnicReg =  /[MLQTHVCSA]|[0-9.\s\,\-]*/g
 // demo path
 let demo_str = 'M 4 2 Q 4 1.2 3.4 0.6 2.8 0 2 0 1.2 0 0.6 0.6 0 1.2 0 2 0 2.8 0.6 3.4 1.2 4 2 4 2.8 4 3.4 3.4 4 2.8 4 2 M 3.1 0.9 Q 3.6 1.3 3.6 2 3.6 2.7 3.1 3.1 2.6 3.6 2 3.6 1.3 3.6 0.8 3.1 0.4 2.7 0.4 2 0.4 1.3 0.8 0.9 1.3 0.4 2 0.4 2.6 0.4 3.1 0.9 Z'
+let sword = 'M 4 8 L 10 1 L 13 0 L 12 3 L 5 9 C 6 10 6 11 7 10 C 7 11 8 12 7 12 A 1.42 1.42 0 0 1 6 13 A 5 5 0 0 0 4 10 Q 3.5 9.9 3.5 10.5 T 2 11.8 T 1.2 11 T 2.5 9.5 T 3 9 A 5 5 90 0 0 0 7 A 1.42 1.42 0 0 1 1 6 C 1 5 2 6 3 6 C 2 7 3 7 4 8 M 10 1 L 10 3 L 12 3 L 10.2 2.8 L 10 1'
 function convertstandardCommand(pathStr) {
     if(typeof pathStr !== 'string') return
     let path = pathStr.trim()
@@ -128,4 +129,6 @@ function toPathString(commands) {
     }).join(' ') + ' Z'
 }
 
-console.log(convert(demo_str))
+console.log(convertstandardCommand(sword))
+
+console.log(setStartMovePoint(abasolute2relative(sword), 100, 100))
